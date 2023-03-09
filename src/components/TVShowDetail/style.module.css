@@ -1,0 +1,32 @@
+.title {
+    font-weight: 400;
+    font-size: 35px;
+}
+.rating_container {
+    display: flex;
+  }
+  .rating {
+    margin-top: 3px;
+    margin-left: 5px;
+  }
+.overview {
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 20px;
+    height: 120px;
+    overflow-y: scroll;
+    margin-top: 10px;
+}
+
+.overview::-webkit-scrollbar {
+    width: 6px;
+}
+
+.overview::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.overview::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 20px;
+}
