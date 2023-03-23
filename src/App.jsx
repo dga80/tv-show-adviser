@@ -6,9 +6,12 @@ import { TVShowDetail } from "./components/TVShowDetail/TVShowDetail";
 import logoImg from "./assets/images/logo.png";
 import { Logo } from "./components/Logo/logo";
 import { TVShowListItem } from "./components/TVShowListItem/TVShowListItem";
+import { TVShowList } from "./components/TVShowList/TVShowList";
+import { SearchBar } from "./components/SearchBar/SearchBar";
 
 export function App() {
   const [currentTVShow, setCurrentTVShow] = useState();
+  const [recommendationList, setRecommendationList] = useState([]);
 
   async function fetchPopulars() {
     const popularTVShowList = await TVShowAPI.fetchPopulars();
@@ -16,37 +19,62 @@ export function App() {
       setCurrentTVShow(popularTVShowList[0]);
     }
   }
+
+  async function fetchRecommendations(tvShowId) {
+    const recommendationListResp = await TVShowAPI.fetchRecommendations(
+      tvShowId
+    );
+    if (recommendationListResp.length > 0) {
+      setRecommendationList(recommendationListResp.slice(0, 10));
+    }
+  }
+  async function fetchByTitle(title) {
+    const searchResponse = await TVShowAPI.fetchByTitle(title);
+    if (searchResponse.length > 0) {
+      setCurrentTVShow(searchResponse[0]);
+    }
+  }
+
   useEffect(() => {
     fetchPopulars();
   }, []);
-  console.log(currentTVShow);
 
+  useEffect(() => {
+    if (currentTVShow) {
+      fetchRecommendations(currentTVShow.id);
+    }
+  }, [currentTVShow]);
+
+  function updateCurrentTVShow(tvShow){
+    setCurrentTVShow(tvShow)
+  }
+
+  console.log(recommendationList);
   return (
     <div
       className={s.main_container}
       style={{
         background: currentTVShow
           ? `linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-                 url("${BACKDROP_BASE_URL}${currentTVShow.backdrop_path}") no-repeat center / cover`
+             url("${BACKDROP_BASE_URL}${currentTVShow.backdrop_path}") no-repeat center / cover`
           : "black",
       }}
     >
       <div className={s.header}>
         <div className="row">
-          <div className="col-4">
+        <div className="col-4">
             <Logo img={logoImg} />
           </div>
           <div className="col-md-12 col-lg-4">
-            <input style={{ width: "100%" }} type="text" />
+            <SearchBar onSubmit={fetchByTitle}/>
           </div>
         </div>
       </div>
-      <div className={s.tv_show_detail}>
+      <div className={s.tv_show_details}>
         {currentTVShow && <TVShowDetail tvShow={currentTVShow} />}
-        {/* TVShowDetail only show if currentTVShow is defined */}
       </div>
-      <div className={s.recommended_tv_shows}>
-        {currentTVShow && <TVShowListItem tvShow={currentTVShow} />}
+      <div className={s.recommended_shows}>
+        {currentTVShow && <TVShowList onClickItem={updateCurrentTVShow} tvShowList={recommendationList}/>}
       </div>
     </div>
   );
